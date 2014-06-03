@@ -17,7 +17,7 @@ and configure your slots in your app's config:
                          .defineSlot('/123456/Your_Slot', [300, 200], 'div-gpt-ad-1234567890123-1');
     });
 
-Now, to show an add, simply use the `ng-dfp-ad`:
+Now, to show an ad, simply use the `ng-dfp-ad`:
 
     <div data-ng-dfp-ad="div-gpt-ad-1234567890123-0"></div>
 
