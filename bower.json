@@ -1,0 +1,10 @@
+{
+  "name": "ngDfp",
+  "version": "0.1.0",
+  "main": "angular-dfp.js",
+  "ignore": [
+    "bower.json",
+    "LICENSE",
+    "README.md"
+  ]
+}
