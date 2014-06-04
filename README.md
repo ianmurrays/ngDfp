@@ -25,6 +25,25 @@ Now, to show an ad, simply use the `ng-dfp-ad`:
 
     <div data-ng-dfp-ad="div-gpt-ad-1234567890123-0"></div>
 
+Refreshing Ads
+--------------
+
+Ads can be refreshed with a global interval or individually. To configure a global interval:
+
+    // Refresh all ads every 30 seconds
+    DoubleClickProvider.setRefreshInterval(30000);
+
+To refresh an ad individually you can do two things:
+
+    <!-- Refresh this ad every `refreshInterval` seconds -->
+    <div ng-dfp-ad="div-gpt-ad-1234567890123-0" ng-dfp-ad-refresh-interval="{{refreshInterval}}"></div>
+    
+Or programatically with the provider:
+
+    app.controller(function (DoubleClick) {
+      DoubleClick.refreshAds('div-gpt-ad-1234567890123-0', 'div-gpt-ad-1234567890123-1');
+    });
+
 Issues
 ------
 

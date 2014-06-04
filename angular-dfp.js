@@ -13,6 +13,16 @@ angular.module('ngDfp', [])
     var slots = {};
 
     /**
+     Defined Slots, so we can refresh the ads
+     */
+    var definedSlots = {};
+
+    /** 
+     If configured, all ads will be refreshed at the same interval
+     */
+    var refreshInterval = null;
+
+    /**
      This initializes the dfp script in the document. Loosely based on angular-re-captcha's
      method of loading the script with promises.
 
@@ -43,12 +53,29 @@ angular.module('ngDfp', [])
      Initializes and configures the slots that were added with defineSlot.
      */
     this._initialize = function () {
-      angular.forEach(slots, function (slot) {
-        googletag.defineSlot.apply(null, slot).addService(googletag.pubads());
+      angular.forEach(slots, function (slot, id) {
+        definedSlots[id] = googletag.defineSlot.apply(null, slot).addService(googletag.pubads());
       });
 
       googletag.pubads().enableSingleRequest();
       googletag.enableServices();
+    };
+
+    /**
+     Returns the global refresh interval
+     */
+    this._refreshInterval = function () {
+      return refreshInterval;
+    };
+
+    /**
+     Allows defining the global refresh interval
+     */
+    this.setRefreshInterval = function (interval) {
+      refreshInterval = interval;
+
+      // Chaining
+      return this;
     };
 
     /**
@@ -63,12 +90,19 @@ angular.module('ngDfp', [])
 
     // Public factory API.
     var self  = this;
-    this.$get = ['$q', '$window', function ($q, $window) {
+    this.$get = ['$q', '$window', '$interval', function ($q, $window, $interval) {
       // Neat trick from github.com/mllrsohn/angular-re-captcha
       var deferred = $q.defer();
 
       self._createTag(function () {
         self._initialize();
+
+        if (self._refreshInterval() !== null) {
+          $interval(function () {
+            $window.googletag.pubads().refresh();
+          }, self._refreshInterval());
+        }
+
         deferred.resolve();
       });
       
@@ -94,18 +128,40 @@ angular.module('ngDfp', [])
 
         runAd: function (id) {
           $window.googletag.display(id);
+        },
+
+        /**
+         Refreshes an ad by its id or ids.
+
+         Example:
+
+             refreshAds('div-123123123-2')
+             refreshAds('div-123123123-2', 'div-123123123-3')
+         */
+        refreshAds: function () {
+          var slots = [];
+
+          angular.forEach(arguments, function (id) {
+            slots.push(definedSlots[id]);
+          });
+
+          $window.googletag.pubads().refresh(slots);
         }
       };
     }];
   }])
 
-  .directive('ngDfpAd', ['$timeout', 'DoubleClick', function ($timeout, DoubleClick) {
+  .directive('ngDfpAd', ['$timeout', '$parse', '$interval', 'DoubleClick', function ($timeout, $parse, $interval, DoubleClick) {
     return {
       restrict: 'A',
       template: '<div id="{{adId}}"></div>',
+      scope: {
+        interval: '@ngDfpAdRefreshInterval'
+      },
       replace: true,
       link: function (scope, iElement, iAttrs) {
-        var id         = iAttrs.ngDfpAd;
+        var id              = iAttrs.ngDfpAd,
+            intervalPromise = null;
         
         scope.adId = id;
 
@@ -113,6 +169,20 @@ angular.module('ngDfp', [])
           iElement.css('width', size[0]).css('height', size[1]);
           $timeout(function () {
             DoubleClick.runAd(id);
+          });
+
+          // Refresh intervals
+          scope.$watch('interval', function (interval) {
+            if (angular.isUndefined(interval)) {
+              return;
+            }
+
+            // Cancel previous interval
+            $interval.cancel(intervalPromise);
+
+            intervalPromise = $interval(function () {
+              DoubleClick.refreshAds(id);
+            }, scope.interval);
           });
         });
       }
