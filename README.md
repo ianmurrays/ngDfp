@@ -6,7 +6,11 @@ ngDfp is a simple library for Angular JS that allows you to add DoubleClick for 
 Getting Started
 ---------------
 
-Simply add `angular-dfp.js` to your project, include it as a dependency:
+Just install via bower:
+
+    bower install ngDfp --save
+
+Then, include it as a dependency:
 
     angular.module('your.module', ['ngDfp'])
 
