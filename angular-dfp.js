@@ -119,7 +119,7 @@ angular.module('ngDfp', [])
             var slot = slots[id];
 
             if (angular.isUndefined(slot)) {
-              throw 'Slot ' + id + ' has not been defined. Define it using DoubleClickProvider.defineSlot().';
+              throw new Error('Slot ' + id + ' has not been defined. Define it using DoubleClickProvider.defineSlot().');
             }
 
             return slots[id][1];
