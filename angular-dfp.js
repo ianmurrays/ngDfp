@@ -191,7 +191,7 @@ angular.module('ngDfp', [])
   .directive('ngDfpAdContainer', function () {
     return {
       restrict: 'A',
-      controller: function ($element) {
+      controller: ['$element', function ($element) {
         this.$$setVisible = function (visible) {
           if (visible) {
             $element.show();
@@ -200,7 +200,7 @@ angular.module('ngDfp', [])
             $element.hide();
           }
         };
-      }
+      }]
     };
   })
 
