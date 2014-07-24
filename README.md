@@ -44,6 +44,21 @@ Or programatically with the provider:
       DoubleClick.refreshAds('div-gpt-ad-1234567890123-0', 'div-gpt-ad-1234567890123-1');
     });
 
+Hiding Emtpy Ads
+----------------
+
+Ads can be hidden by adding the attribute `data-ng-dfp-ad-hide-when-empty` to the ad tag. You have to 
+specify the container of the ad using the data-ng-dfp-ad-container directive. This is useful if you contain
+the ad in a parent div with some styles. For example, the following snippet will hide itself when empty:
+
+    <div data-ng-dfp-ad="div-gpt-ad-1234567890123-0" data-ng-dfp-ad-hide-when-empty data-ng-dfp-ad-container></div>
+
+And the following will hide the container
+
+    <div class="my-fancy-ad-container" data-ng-dfp-ad-container>
+      <div data-ng-dfp-ad="div-gpt-ad-1234567890123-0" data-ng-dfp-ad-hide-when-empty></div>
+    </div>
+
 Issues
 ------
 

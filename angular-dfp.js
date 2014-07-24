@@ -58,7 +58,18 @@ angular.module('ngDfp', [])
       });
 
       googletag.pubads().enableSingleRequest();
+      googletag.pubads().collapseEmptyDivs();
       googletag.enableServices();
+
+      googletag.pubads().addEventListener('slotRenderEnded', this._slotRenderEnded);
+    };
+
+    this._slotRenderEnded = function (event) {
+      var callback = slots[event.slot.getSlotId().getDomId()].renderCallback;
+      
+      if (typeof callback === 'function') {
+        callback();
+      }
     };
 
     /**
@@ -82,7 +93,17 @@ angular.module('ngDfp', [])
      Stores a slot definition.
      */
     this.defineSlot = function () {
-      slots[arguments[2]] = arguments;
+      var slot = arguments;
+
+      slot.getSize = function () {
+        return this[1];
+      };
+
+      slot.setRenderCallback = function (callback) {
+        this.renderCallback = callback;
+      };
+
+      slots[arguments[2]] = slot;
 
       // Chaining.
       return this;
@@ -111,6 +132,8 @@ angular.module('ngDfp', [])
          More than just getting the ad size, this 
          allows us to wait for the JS file to finish downloading and 
          configuring ads
+
+         @deprecated Use getSlot().getSize() instead.
          */
         getAdSize: function (id) {
           return deferred.promise.then(function () {
@@ -119,10 +142,24 @@ angular.module('ngDfp', [])
             var slot = slots[id];
 
             if (angular.isUndefined(slot)) {
-              throw new Error('Slot ' + id + ' has not been defined. Define it using DoubleClickProvider.defineSlot().');
+              throw 'Slot ' + id + ' has not been defined. Define it using DoubleClickProvider.defineSlot().';
             }
 
             return slots[id][1];
+          });
+        },
+
+        getSlot: function (id) {
+          return deferred.promise.then(function () {
+            // Return the size of the ad. The directive should construct
+            // the tag by itself.
+            var slot = slots[id];
+
+            if (angular.isUndefined(slot)) {
+              throw 'Slot ' + id + ' has not been defined. Define it using DoubleClickProvider.defineSlot().';
+            }
+
+            return slots[id];
           });
         },
 
@@ -151,25 +188,62 @@ angular.module('ngDfp', [])
     }];
   }])
 
+  .directive('ngDfpAdContainer', function () {
+    return {
+      restrict: 'A',
+      controller: function ($element) {
+        this.$$setVisible = function (visible) {
+          if (visible) {
+            $element.show();
+          }
+          else {
+            $element.hide();
+          }
+        };
+      }
+    };
+  })
+
   .directive('ngDfpAd', ['$timeout', '$parse', '$interval', 'DoubleClick', function ($timeout, $parse, $interval, DoubleClick) {
     return {
       restrict: 'A',
       template: '<div id="{{adId}}"></div>',
+      require: '?^ngDfpAdContainer',
       scope: {
         interval: '@ngDfpAdRefreshInterval'
       },
       replace: true,
-      link: function (scope, iElement, iAttrs) {
-        var id              = iAttrs.ngDfpAd,
+      link: function (scope, element, attrs, ngDfpAdContainer) {
+        var id              = attrs.ngDfpAd,
             intervalPromise = null;
         
         scope.adId = id;
 
-        DoubleClick.getAdSize(id).then(function (size) {
-          iElement.css('width', size[0]).css('height', size[1]);
+        DoubleClick.getSlot(id).then(function (slot) {
+          var size = slot.getSize();
+
+          element.css('width', size[0]).css('height', size[1]);
           $timeout(function () {
             DoubleClick.runAd(id);
           });
+
+          // Only if we have a container we hide this thing
+          if (ngDfpAdContainer) {
+            slot.setRenderCallback(function () {
+              if (angular.isDefined(attrs.ngDfpAdHideWhenEmpty)) {
+                if (element.find('iframe:not([id*=hidden])')
+                           .map(function () { return this.contentWindow.document; })
+                           .find("body")
+                           .children().length === 0) {
+                  // Hide it
+                  ngDfpAdContainer.$$setVisible(false);
+                }
+                else {
+                  ngDfpAdContainer.$$setVisible(true);
+                }
+              }
+            });
+          }
 
           // Refresh intervals
           scope.$watch('interval', function (interval) {
