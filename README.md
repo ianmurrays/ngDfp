@@ -3,6 +3,11 @@ ngDfp
 
 ngDfp is a simple library for Angular JS that allows you to add DoubleClick for Publishers tags to your Angular site.
 
+Requirements
+------------
+
+This library requires Angular JS 1.2 or higher. It might work with older versions but I can't guarantee it.
+
 Getting Started
 ---------------
 
