@@ -210,53 +210,53 @@ angular.module('ngDfp', [])
       template: '<div id="{{adId}}"></div>',
       require: '?^ngDfpAdContainer',
       scope: {
+        adId: '@ngDfpAd',
         interval: '@ngDfpAdRefreshInterval'
       },
       replace: true,
       link: function (scope, element, attrs, ngDfpAdContainer) {
-        var id              = attrs.ngDfpAd,
-            intervalPromise = null;
-        
-        scope.adId = id;
+        scope.$watch('adId', function (id) {
+          var intervalPromise = null;
 
-        DoubleClick.getSlot(id).then(function (slot) {
-          var size = slot.getSize();
+          DoubleClick.getSlot(id).then(function (slot) {
+            var size = slot.getSize();
 
-          element.css('width', size[0]).css('height', size[1]);
-          $timeout(function () {
-            DoubleClick.runAd(id);
-          });
-
-          // Only if we have a container we hide this thing
-          if (ngDfpAdContainer) {
-            slot.setRenderCallback(function () {
-              if (angular.isDefined(attrs.ngDfpAdHideWhenEmpty)) {
-                if (element.find('iframe:not([id*=hidden])')
-                           .map(function () { return this.contentWindow.document; })
-                           .find("body")
-                           .children().length === 0) {
-                  // Hide it
-                  ngDfpAdContainer.$$setVisible(false);
-                }
-                else {
-                  ngDfpAdContainer.$$setVisible(true);
-                }
-              }
+            element.css('width', size[0]).css('height', size[1]);
+            $timeout(function () {
+              DoubleClick.runAd(id);
             });
-          }
 
-          // Refresh intervals
-          scope.$watch('interval', function (interval) {
-            if (angular.isUndefined(interval)) {
-              return;
+            // Only if we have a container we hide this thing
+            if (ngDfpAdContainer) {
+              slot.setRenderCallback(function () {
+                if (angular.isDefined(attrs.ngDfpAdHideWhenEmpty)) {
+                  if (element.find('iframe:not([id*=hidden])')
+                             .map(function () { return this.contentWindow.document; })
+                             .find("body")
+                             .children().length === 0) {
+                    // Hide it
+                    ngDfpAdContainer.$$setVisible(false);
+                  }
+                  else {
+                    ngDfpAdContainer.$$setVisible(true);
+                  }
+                }
+              });
             }
 
-            // Cancel previous interval
-            $interval.cancel(intervalPromise);
+            // Refresh intervals
+            scope.$watch('interval', function (interval) {
+              if (angular.isUndefined(interval)) {
+                return;
+              }
 
-            intervalPromise = $interval(function () {
-              DoubleClick.refreshAds(id);
-            }, scope.interval);
+              // Cancel previous interval
+              $interval.cancel(intervalPromise);
+
+              intervalPromise = $interval(function () {
+                DoubleClick.refreshAds(id);
+              }, scope.interval);
+            });
           });
         });
       }
