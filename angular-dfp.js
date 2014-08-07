@@ -58,7 +58,6 @@ angular.module('ngDfp', [])
       });
 
       googletag.pubads().enableSingleRequest();
-      googletag.pubads().collapseEmptyDivs();
       googletag.enableServices();
 
       googletag.pubads().addEventListener('slotRenderEnded', this._slotRenderEnded);
