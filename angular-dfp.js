@@ -215,6 +215,9 @@ angular.module('ngDfp', [])
       replace: true,
       link: function (scope, element, attrs, ngDfpAdContainer) {
         scope.$watch('adId', function (id) {
+          // Get rid of the previous ad.
+          element.html('');
+
           var intervalPromise = null;
 
           DoubleClick.getSlot(id).then(function (slot) {
