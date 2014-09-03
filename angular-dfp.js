@@ -191,12 +191,30 @@ angular.module('ngDfp', [])
     return {
       restrict: 'A',
       controller: ['$element', function ($element) {
-        this.$$setVisible = function (visible) {
-          if (visible) {
-            $element.show();
+        function hide(mode) {
+          if (mode === 'visibility') {
+            $element.css('visibility', 'hidden');
           }
           else {
             $element.hide();
+          }
+        }
+
+        function show(mode) {
+          if (mode === 'visibility') {
+            $element.css('visibility', 'visible');
+          }
+          else {
+            $element.show();
+          }
+        }
+
+        this.$$setVisible = function (visible, mode) {
+          if (visible) {
+            show(mode);
+          }
+          else {
+            hide(mode);
           }
         };
       }]
@@ -237,10 +255,10 @@ angular.module('ngDfp', [])
                              .find("body")
                              .children().length === 0) {
                     // Hide it
-                    ngDfpAdContainer.$$setVisible(false);
+                    ngDfpAdContainer.$$setVisible(false, attrs.ngDfpAdHideWhenEmpty);
                   }
                   else {
-                    ngDfpAdContainer.$$setVisible(true);
+                    ngDfpAdContainer.$$setVisible(true, attrs.ngDfpAdHideWhenEmpty);
                   }
                 }
               });
@@ -264,3 +282,4 @@ angular.module('ngDfp', [])
       }
     };
   }]);
+ 
