@@ -23,12 +23,22 @@ angular.module('ngDfp', [])
     var refreshInterval = null;
 
     /**
+     If false the google ads library won't be loaded and no promises will be fulfilled.
+     */
+    var enabled = true;
+
+    /**
      This initializes the dfp script in the document. Loosely based on angular-re-captcha's
      method of loading the script with promises.
 
      @link https://github.com/mllrsohn/angular-re-captcha/blob/master/angular-re-captcha.js
      */
     this._createTag = function (callback) {
+      console.log('createTag')
+      if ( ! enabled) {
+        return;
+      }
+
       var gads   = document.createElement('script'),
           useSSL = 'https:' === document.location.protocol,
           node   = document.getElementsByTagName('script')[0];
@@ -106,6 +116,14 @@ angular.module('ngDfp', [])
 
       // Chaining.
       return this;
+    };
+
+    /**
+     Enables/Disables the entire library. Basically doesn't load the google ads library.
+     Useful to disable ads entirely given a certain condition is met.
+     */
+    this.setEnabled = function (setting) {
+      enabled = setting;
     };
 
     // Public factory API.
