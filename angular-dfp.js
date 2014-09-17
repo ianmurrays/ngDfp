@@ -34,7 +34,6 @@ angular.module('ngDfp', [])
      @link https://github.com/mllrsohn/angular-re-captcha/blob/master/angular-re-captcha.js
      */
     this._createTag = function (callback) {
-      console.log('createTag')
       if ( ! enabled) {
         return;
       }
