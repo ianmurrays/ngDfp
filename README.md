@@ -64,6 +64,15 @@ And the following will hide the container
       <div data-ng-dfp-ad="div-gpt-ad-1234567890123-0" data-ng-dfp-ad-hide-when-empty></div>
     </div>
 
+Minimizing
+----------
+
+Closure Compiler is used to minimize the code. It is minimized using this command
+
+    closure-compiler --js_output_file=angular-dfp.min.js --compilation_level SIMPLE angular-dfp.js
+
+Advanced optimizations are not used because as of now the AngularJS codebase does not support it.
+
 Issues
 ------
 
