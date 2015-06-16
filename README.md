@@ -49,6 +49,16 @@ Or programatically with the provider:
       DoubleClick.refreshAds('div-gpt-ad-1234567890123-0', 'div-gpt-ad-1234567890123-1');
     });
 
+Optionally, you can refresh an ad individually immediately or after a defined timeout:
+```
+<!-- Refresh this ad immediately -->
+<div ng-dfp-ad="div-gpt-ad-1234567890123-0" ng-dfp-ad-refresh></div>
+```
+```
+<!-- Refresh this ad after `refreshTimeout` seconds -->
+<div ng-dfp-ad="div-gpt-ad-1234567890123-0" ng-dfp-ad-refresh-timeout="{{refreshTimeout}}"></div>
+```
+
 Hiding Emtpy Ads
 ----------------
 

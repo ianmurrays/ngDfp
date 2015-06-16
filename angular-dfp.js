@@ -245,7 +245,9 @@ angular.module('ngDfp', [])
       require: '?^ngDfpAdContainer',
       scope: {
         adId: '@ngDfpAd',
-        interval: '@ngDfpAdRefreshInterval'
+        refresh: '@ngDfpAdRefresh',
+        interval: '@ngDfpAdRefreshInterval',
+        timeout: '@ngDfpAdRefreshTimeout'
       },
       replace: true,
       link: function (scope, element, attrs, ngDfpAdContainer) {
@@ -281,6 +283,14 @@ angular.module('ngDfp', [])
               });
             }
 
+            // Forces Refresh
+            scope.$watch('refresh', function (refresh) {
+              if (angular.isUndefined(refresh)) {
+                return;
+              }
+              DoubleClick.refreshAds(id);
+            });
+
             // Refresh intervals
             scope.$watch('interval', function (interval) {
               if (angular.isUndefined(interval)) {
@@ -293,6 +303,17 @@ angular.module('ngDfp', [])
               intervalPromise = $interval(function () {
                 DoubleClick.refreshAds(id);
               }, scope.interval);
+            });
+
+            // Refresh after timeout
+            scope.$watch('timeout', function (timeout) {
+              if (angular.isUndefined(timeout)) {
+                return;
+              }
+
+              $timeout(function () {
+                DoubleClick.refreshAds(id);
+              }, scope.timeout);
             });
           });
         });
