@@ -1,6 +1,6 @@
 {
   "name": "ngDfp",
-  "version": "0.6.3",
+  "version": "0.7.0",
   "main": "angular-dfp.js",
   "ignore": [
     "bower.json",

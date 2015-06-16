@@ -17,6 +17,11 @@ angular.module('ngDfp', [])
      */
     var definedSlots = {};
 
+    /**
+     Holds size mapping configuration
+     */
+    var sizeMapping = {};
+
     /** 
      If configured, all ads will be refreshed at the same interval
      */
@@ -64,6 +69,9 @@ angular.module('ngDfp', [])
     this._initialize = function () {
       angular.forEach(slots, function (slot, id) {
         definedSlots[id] = googletag.defineSlot.apply(null, slot).addService(googletag.pubads());
+        if(sizeMapping[id]){
+          definedSlots[id].defineSizeMapping(sizeMapping[id]);
+        }
       });
 
       googletag.pubads().enableSingleRequest();
@@ -112,6 +120,26 @@ angular.module('ngDfp', [])
       };
 
       slots[arguments[2]] = slot;
+
+      // Chaining.
+      return this;
+    };
+
+    /**
+     Stores a slot size mapping.
+     */
+    this.defineSizeMapping = function (){
+      var id = arguments[0];
+
+      if(!sizeMapping[id]){
+        sizeMapping[id] = [];
+      }
+      
+      // Add a new size mapping ( [browser size], [slot size])
+      this.addSize = function() {
+        sizeMapping[id].push([arguments[0], arguments[1]]);
+        return this;
+      }
 
       // Chaining.
       return this;
