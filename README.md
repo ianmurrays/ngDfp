@@ -74,6 +74,21 @@ And the following will hide the container
       <div data-ng-dfp-ad="div-gpt-ad-1234567890123-0" data-ng-dfp-ad-hide-when-empty></div>
     </div>
 
+Responsive Ads
+----------------
+You can use Google Publisher Tags (GPT) to build responsive ads that fit the browser your visitors use to view your website. This means that your ads will look good whether your visitors are using a desktop, tablet, or smartphone.  
+More information about [Building Responsive Ads](https://support.google.com/dfp_premium/answer/3423562?hl=en).
+
+```
+DoubleClickProvider
+    .defineSizeMapping('div-gpt-ad-1431622560634-6')
+    .addSize([1024, 768], [970, 90])
+    .addSize([980, 690], [728, 90])
+    .addSize([640, 480], [728, 90])
+    // Fits browsers of any size smaller than 640 x 480
+    addSize([0, 0], [88, 31]);
+```
+
 Minimizing
 ----------
 
