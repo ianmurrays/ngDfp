@@ -87,7 +87,7 @@ DoubleClickProvider
     .addSize([980, 690], [728, 90])
     .addSize([640, 480], [728, 90])
     // Fits browsers of any size smaller than 640 x 480
-    addSize([0, 0], [88, 31]);
+    .addSize([0, 0], [88, 31]);
 ```
 
 Minimizing
