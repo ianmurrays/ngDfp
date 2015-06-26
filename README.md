@@ -80,13 +80,14 @@ You can use Google Publisher Tags (GPT) to build responsive ads that fit the bro
 More information about [Building Responsive Ads](https://support.google.com/dfp_premium/answer/3423562?hl=en).
 
 ```
+DoubleClickProvider.defineSlot('/123456/Your_Slot', [[970, 90], [728, 90], [88, 31]], 'div-gpt-ad-1431622560634-6');
 DoubleClickProvider
     .defineSizeMapping('div-gpt-ad-1431622560634-6')
     .addSize([1024, 768], [970, 90])
     .addSize([980, 690], [728, 90])
     .addSize([640, 480], [728, 90])
     // Fits browsers of any size smaller than 640 x 480
-    addSize([0, 0], [88, 31]);
+    .addSize([0, 0], [88, 31]);
 ```
 
 Minimizing
