@@ -1,8 +1,5 @@
 'use strict';
 
-var googletag     = googletag || {};
-    googletag.cmd = googletag.cmd || [];
-
 angular.module('ngDfp', [])
   .constant('ngDfpUrl', '//www.googletagservices.com/tag/js/gpt.js')
 
@@ -66,18 +63,18 @@ angular.module('ngDfp', [])
     /**
      Initializes and configures the slots that were added with defineSlot.
      */
-    this._initialize = function () {
+    this._initialize = function ($window) {
       angular.forEach(slots, function (slot, id) {
-        definedSlots[id] = googletag.defineSlot.apply(null, slot).addService(googletag.pubads());
+        definedSlots[id] = $window.googletag.defineSlot.apply(null, slot).addService($window.googletag.pubads());
         if(sizeMapping[id]){
           definedSlots[id].defineSizeMapping(sizeMapping[id]);
         }
       });
 
-      googletag.pubads().enableSingleRequest();
-      googletag.enableServices();
+      $window.googletag.pubads().enableSingleRequest();
+      $window.googletag.enableServices();
 
-      googletag.pubads().addEventListener('slotRenderEnded', this._slotRenderEnded);
+      $window.googletag.pubads().addEventListener('slotRenderEnded', this._slotRenderEnded);
     };
 
     this._slotRenderEnded = function (event) {
@@ -160,7 +157,7 @@ angular.module('ngDfp', [])
       var deferred = $q.defer();
 
       self._createTag(function () {
-        self._initialize();
+        self._initialize($window);
 
         if (self._refreshInterval() !== null) {
           $interval(function () {
