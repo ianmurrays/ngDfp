@@ -67,17 +67,20 @@ angular.module('ngDfp', [])
      Initializes and configures the slots that were added with defineSlot.
      */
     this._initialize = function () {
-      angular.forEach(slots, function (slot, id) {
-        definedSlots[id] = googletag.defineSlot.apply(null, slot).addService(googletag.pubads());
-        if(sizeMapping[id]){
-          definedSlots[id].defineSizeMapping(sizeMapping[id]);
-        }
+      // when the GPT JavaScript is loaded, it looks through the array and executes all the functions in order
+      googletag.cmd.push(function() {
+        angular.forEach(slots, function (slot, id) {
+          definedSlots[id] = googletag.defineSlot.apply(null, slot).addService(googletag.pubads());
+          if(sizeMapping[id]){
+            definedSlots[id].defineSizeMapping(sizeMapping[id]);
+          }
+        });
+
+        googletag.pubads().enableSingleRequest();
+        googletag.enableServices();
+
+        googletag.pubads().addEventListener('slotRenderEnded', this._slotRenderEnded);
       });
-
-      googletag.pubads().enableSingleRequest();
-      googletag.enableServices();
-
-      googletag.pubads().addEventListener('slotRenderEnded', this._slotRenderEnded);
     };
 
     this._slotRenderEnded = function (event) {
