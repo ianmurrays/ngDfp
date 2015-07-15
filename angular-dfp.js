@@ -211,7 +211,9 @@ angular.module('ngDfp', [])
         },
 
         runAd: function (id) {
-          $window.googletag.display(id);
+          googletag.cmd.push(function() {
+            $window.googletag.display(id);
+          });
         },
 
         /**
