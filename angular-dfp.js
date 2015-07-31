@@ -32,6 +32,8 @@ angular.module('ngDfp', [])
      */
     var enabled = true;
 
+    var collapseEmptyDivs = false;
+
     /**
      This initializes the dfp script in the document. Loosely based on angular-re-captcha's
      method of loading the script with promises.
@@ -75,6 +77,9 @@ angular.module('ngDfp', [])
             definedSlots[id].defineSizeMapping(sizeMapping[id]);
           }
         });
+
+        if (collapseEmptyDivs)
+          googletag.pubads().collapseEmptyDivs();
 
         googletag.pubads().enableSingleRequest();
         googletag.enableServices();
@@ -124,6 +129,12 @@ angular.module('ngDfp', [])
 
       slots[arguments[2]] = slot;
 
+      // Chaining.
+      return this;
+    };
+
+    this.collapseEmptyDivs = function () {
+      collapseEmptyDivs = true;
       // Chaining.
       return this;
     };
