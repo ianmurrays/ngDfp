@@ -38,6 +38,11 @@ angular.module('ngDfp', [])
     var pageTargeting = {};
 
     /**
+     Collapse empty divs if true
+     */
+    var collapseEmptyDivs = false;
+
+    /**
      This initializes the dfp script in the document. Loosely based on angular-re-captcha's
      method of loading the script with promises.
 
@@ -87,6 +92,13 @@ angular.module('ngDfp', [])
         angular.forEach(pageTargeting, function (value, key) {
           googletag.pubads().setTargeting(key, value);
         });
+
+        /**
+         If requested set to true the collapseEmptyDivs
+         */
+        if (collapseEmptyDivs) {
+          googletag.pubads().collapseEmptyDivs();
+        }
 
         googletag.pubads().enableSingleRequest();
         googletag.enableServices();
@@ -173,6 +185,13 @@ angular.module('ngDfp', [])
      */
     this.setPageTargeting = function (key, value) {
       pageTargeting[key] = value;
+    };
+
+    /**
+     Set to true the collapseEmptyDivs
+     */
+    this.collapseEmptyDivs = function () {
+      collapseEmptyDivs = true;
     };
 
     // Public factory API.
