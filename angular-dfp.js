@@ -171,8 +171,8 @@ angular.module('ngDfp', [])
     /**
      Stores page targeting key->values
      */
-    this.setPageTargeting = function () {
-      pageTargeting[arguments[0]] = arguments[1];
+    this.setPageTargeting = function (key, value) {
+      pageTargeting[key] = value;
     };
 
     // Public factory API.
