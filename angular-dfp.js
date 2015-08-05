@@ -33,8 +33,8 @@ angular.module('ngDfp', [])
     var enabled = true;
 
     /**
-     Defined Page targetting key->values
-    */
+     Defined Page targeting key->values
+     */
     var pageTargeting = {};
 
     /**
@@ -82,8 +82,8 @@ angular.module('ngDfp', [])
         });
 
 	/**
-         Set the page targetting key->values
-        */
+         Set the page targeting key->values
+         */
         angular.forEach(pageTargeting, function (value, key) {
           googletag.pubads().setTargeting(key,value);
         });
@@ -169,8 +169,8 @@ angular.module('ngDfp', [])
     };
 
     /**
-     Stores page targetting key->values
-    */
+     Stores page targeting key->values
+     */
     this.setPageTargeting = function () {
       pageTargeting[arguments[0]] = arguments[1];
     };
