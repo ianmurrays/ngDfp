@@ -33,6 +33,11 @@ angular.module('ngDfp', [])
     var enabled = true;
 
     /**
+     Defined Page targeting key->values
+     */
+    var pageTargeting = {};
+
+    /**
      This initializes the dfp script in the document. Loosely based on angular-re-captcha's
      method of loading the script with promises.
 
@@ -74,6 +79,13 @@ angular.module('ngDfp', [])
           if(sizeMapping[id]){
             definedSlots[id].defineSizeMapping(sizeMapping[id]);
           }
+        });
+
+	/**
+         Set the page targeting key->values
+         */
+        angular.forEach(pageTargeting, function (value, key) {
+          googletag.pubads().setTargeting(key, value);
         });
 
         googletag.pubads().enableSingleRequest();
@@ -154,6 +166,13 @@ angular.module('ngDfp', [])
      */
     this.setEnabled = function (setting) {
       enabled = setting;
+    };
+
+    /**
+     Stores page targeting key->values
+     */
+    this.setPageTargeting = function (key, value) {
+      pageTargeting[key] = value;
     };
 
     // Public factory API.
