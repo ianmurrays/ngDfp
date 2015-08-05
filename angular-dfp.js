@@ -85,7 +85,7 @@ angular.module('ngDfp', [])
          Set the page targeting key->values
          */
         angular.forEach(pageTargeting, function (value, key) {
-          googletag.pubads().setTargeting(key,value);
+          googletag.pubads().setTargeting(key, value);
         });
 
         googletag.pubads().enableSingleRequest();
