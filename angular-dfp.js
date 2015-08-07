@@ -86,7 +86,7 @@ angular.module('ngDfp', [])
           }
         });
 
-	/**
+	      /**
          Set the page targeting key->values
          */
         angular.forEach(pageTargeting, function (value, key) {
@@ -205,7 +205,9 @@ angular.module('ngDfp', [])
 
         if (self._refreshInterval() !== null) {
           $interval(function () {
-            $window.googletag.pubads().refresh();
+            googletag.cmd.push(function() {
+              $window.googletag.pubads().refresh();
+            });
           }, self._refreshInterval());
         }
 
@@ -269,7 +271,9 @@ angular.module('ngDfp', [])
             slots.push(definedSlots[id]);
           });
 
-          $window.googletag.pubads().refresh(slots);
+          googletag.cmd.push(function() {
+            $window.googletag.pubads().refresh(slots);
+          });
         }
       };
     }];
