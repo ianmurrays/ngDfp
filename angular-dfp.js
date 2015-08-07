@@ -275,6 +275,20 @@ angular.module('ngDfp', [])
           googletag.cmd.push(function() {
             $window.googletag.pubads().refresh(slots);
           });
+        },
+
+        /**
+         Stores a slot definition.
+        */
+        defineSlot: function() {
+          return self.defineSlot(arguments[0], arguments[1], arguments[2]);
+        },
+
+        /**
+         Stores a slot size mapping.
+        */
+        defineSizeMapping: function() {
+          return self.defineSizeMapping(arguments[0]);
         }
       };
     }];
