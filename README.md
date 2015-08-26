@@ -21,10 +21,10 @@ Then, include it as a dependency:
 
 and configure your slots in your app's config:
 
-    .config(function (DoubleClickProvider) {
+    .config(['DoubleClickProvider', function (DoubleClickProvider) {
       DoubleClickProvider.defineSlot('/123456/Your_Slot', [100, 500], 'div-gpt-ad-1234567890123-0')
                          .defineSlot('/123456/Your_Slot', [300, 200], 'div-gpt-ad-1234567890123-1');
-    });
+    }]);
 
 Now, to show an ad, simply use the `ng-dfp-ad`:
 
@@ -45,9 +45,9 @@ To refresh an ad individually you can do two things:
     
 Or programatically with the provider:
 
-    app.controller(function (DoubleClick) {
+    app.controller(['DoubleClick', function (DoubleClick) {
       DoubleClick.refreshAds('div-gpt-ad-1234567890123-0', 'div-gpt-ad-1234567890123-1');
-    });
+    }]);
 
 Optionally, you can refresh an ad individually immediately or after a defined timeout:
 ```
