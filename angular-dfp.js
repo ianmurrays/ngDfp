@@ -85,6 +85,16 @@ angular.module('ngDfp', [])
           if(sizeMapping[id]){
             definedSlots[id].defineSizeMapping(sizeMapping[id]);
           }
+
+          /**
+           If sent, set the slot specific targeting
+           */
+	  var slotTargeting = slot.getSlotTargeting();
+          if(slotTargeting){
+            angular.forEach(slotTargeting, function (value, key) {
+              definedSlots[id].setTargeting(value.id, value.value);
+            });
+          }
         });
 
 	      /**
@@ -141,6 +151,22 @@ angular.module('ngDfp', [])
 
       slot.getSize = function () {
         return this[1];
+      };
+
+      /**
+       To be able to get the array of slot targeting key/value
+       Example of the json format of the arguments: [{"id":"age","value":"20-30"}]
+       For multiple targeting key,values example: [{"id":"age","value":"20-30"},{"id":"gender","value":"male"}]
+       */
+      slot.getSlotTargeting = function() {
+        /**
+         The third parameter is optional
+         */
+        if (this[3]) {
+          return this[3];
+        } else {
+          return false;
+        }
       };
 
       slot.setRenderCallback = function (callback) {
