@@ -22,7 +22,7 @@ angular.module('ngDfp', [])
      */
     var sizeMapping = {};
 
-    /** 
+    /**
      If configured, all ads will be refreshed at the same interval
      */
     var refreshInterval = null;
@@ -49,7 +49,7 @@ angular.module('ngDfp', [])
      @link https://github.com/mllrsohn/angular-re-captcha/blob/master/angular-re-captcha.js
      */
     this._createTag = function (callback) {
-      if ( ! enabled) {
+      if (!enabled) {
         return;
       }
 
@@ -60,7 +60,7 @@ angular.module('ngDfp', [])
       gads.async = true;
       gads.type  = 'text/javascript';
       gads.src   = (useSSL ? 'https:' : 'http:') + ngDfpUrl;
-      
+
       // Insert before any JS include.
       node.parentNode.insertBefore(gads, node);
 
@@ -78,49 +78,31 @@ angular.module('ngDfp', [])
      */
     this._initialize = function () {
       var self = this;
-      // when the GPT JavaScript is loaded, it looks through the array and executes all the functions in order
-      googletag.cmd.push(function() {
-        angular.forEach(slots, function (slot, id) {
-          definedSlots[id] = googletag.defineSlot.apply(null, slot).addService(googletag.pubads());
-          if(sizeMapping[id]){
-            definedSlots[id].defineSizeMapping(sizeMapping[id]);
-          }
 
-          /**
-           If sent, set the slot specific targeting
-           */
-	  var slotTargeting = slot.getSlotTargeting();
-          if(slotTargeting){
-            angular.forEach(slotTargeting, function (value, key) {
-              definedSlots[id].setTargeting(value.id, value.value);
-            });
-          }
-        });
-
-	      /**
-         Set the page targeting key->values
-         */
-        angular.forEach(pageTargeting, function (value, key) {
-          googletag.pubads().setTargeting(key, value);
-        });
-
-        /**
-         If requested set to true the collapseEmptyDivs
-         */
-        if (collapseEmptyDivs) {
-          googletag.pubads().collapseEmptyDivs();
-        }
-
-        googletag.pubads().enableSingleRequest();
-        googletag.enableServices();
-
-        googletag.pubads().addEventListener('slotRenderEnded', self._slotRenderEnded);
+      /**
+       Set the page targeting key->values
+       */
+      angular.forEach(pageTargeting, function (value, key) {
+        googletag.pubads().setTargeting(key, value);
       });
+
+      /**
+       If requested set to true the collapseEmptyDivs
+       */
+      if (collapseEmptyDivs) {
+        googletag.pubads().collapseEmptyDivs();
+      }
+
+      googletag.pubads().enableSingleRequest();
+      googletag.enableServices();
+
+      googletag.pubads().addEventListener('slotRenderEnded', self._slotRenderEnded);
+
     };
 
     this._slotRenderEnded = function (event) {
       var callback = slots[event.slot.getSlotId().getDomId()].renderCallback;
-      
+
       if (typeof callback === 'function') {
         callback();
       }
@@ -178,7 +160,18 @@ angular.module('ngDfp', [])
       // Chaining.
       return this;
     };
-
+    this.defineOutOfPageSlot = function () {
+      var slot = arguments;
+      slot.getSize = function () {
+        return false;
+      };
+      slot.setRenderCallback = function (callback) {
+        this.renderCallback = callback;
+      };
+      slots[arguments[1]] = slot;
+      // Chaining.
+      return this;
+    };
     /**
      Stores a slot size mapping.
      */
@@ -188,7 +181,7 @@ angular.module('ngDfp', [])
       if(!sizeMapping[id]){
         sizeMapping[id] = [];
       }
-      
+
       // Add a new size mapping ( [browser size], [slot size])
       this.addSize = function() {
         sizeMapping[id].push([arguments[0], arguments[1]]);
@@ -228,8 +221,7 @@ angular.module('ngDfp', [])
       var deferred = $q.defer();
 
       self._createTag(function () {
-        self._initialize();
-
+        //self._initialize();
         if (self._refreshInterval() !== null) {
           $interval(function () {
             googletag.cmd.push(function() {
@@ -240,11 +232,11 @@ angular.module('ngDfp', [])
 
         deferred.resolve();
       });
-      
+
       return {
         /**
-         More than just getting the ad size, this 
-         allows us to wait for the JS file to finish downloading and 
+         More than just getting the ad size, this
+         allows us to wait for the JS file to finish downloading and
          configuring ads
 
          @deprecated Use getSlot().getSize() instead.
@@ -271,12 +263,27 @@ angular.module('ngDfp', [])
 
             if (angular.isUndefined(slot)) {
               throw 'Slot ' + id + ' has not been defined. Define it using DoubleClickProvider.defineSlot().';
+            } else {
+              googletag.cmd.push(function () {
+                if (slot[2] == undefined) {
+                  definedSlots[id] = googletag.defineOutOfPageSlot.apply(null, slot).addService(googletag.pubads());
+                } else {
+                  definedSlots[id] = googletag.defineSlot.apply(null, slot).addService(googletag.pubads());
+                }
+                if (sizeMapping[id]) {
+                  definedSlots[id].defineSizeMapping(sizeMapping[id]);
+                }
+              });
             }
 
             return slots[id];
           });
         },
-
+        fireAd: function (id) {
+          googletag.cmd.push(function () {
+            self._initialize();
+          });
+        },
         runAd: function (id) {
           googletag.cmd.push(function() {
             $window.googletag.display(id);
@@ -360,9 +367,12 @@ angular.module('ngDfp', [])
           var intervalPromise = null;
 
           DoubleClick.getSlot(id).then(function (slot) {
+            DoubleClick.fireAd(id);
             var size = slot.getSize();
-
-            element.css('width', size[0]).css('height', size[1]);
+            DoubleClick.refreshAds(id);
+            if (size) {
+              element.css('width', size[0]).css('height', size[1])
+            };
             $timeout(function () {
               DoubleClick.runAd(id);
             });
@@ -422,4 +432,3 @@ angular.module('ngDfp', [])
       }
     };
   }]);
- 
