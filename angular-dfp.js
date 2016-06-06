@@ -43,6 +43,12 @@ angular.module('ngDfp', [])
     var collapseEmptyDivs = false;
 
     /**
+     * If true, enables Single Request Architecture (SRA)
+     * @type {boolean}
+     */
+    var enableSingleRequest = true;
+
+    /**
      This initializes the dfp script in the document. Loosely based on angular-re-captcha's
      method of loading the script with promises.
 
@@ -111,7 +117,9 @@ angular.module('ngDfp', [])
           googletag.pubads().collapseEmptyDivs();
         }
 
-        googletag.pubads().enableSingleRequest();
+        if (enableSingleRequest) {
+          googletag.pubads().enableSingleRequest();
+        }
         googletag.enableServices();
 
         googletag.pubads().addEventListener('slotRenderEnded', self._slotRenderEnded);
@@ -219,6 +227,14 @@ angular.module('ngDfp', [])
      */
     this.collapseEmptyDivs = function () {
       collapseEmptyDivs = true;
+    };
+
+    /**
+     * Set Single Request Architecture
+     * @param isEnable
+     */
+    this.setSingleRequest = function (isEnable) {
+      enableSingleRequest = isEnable;
     };
 
     // Public factory API.
