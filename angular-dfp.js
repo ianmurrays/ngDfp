@@ -438,4 +438,3 @@ angular.module('ngDfp', [])
       }
     };
   }]);
- 
