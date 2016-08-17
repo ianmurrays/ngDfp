@@ -2,7 +2,7 @@
   "name": "ngDfp",
   "version": "0.14.0",
   "description": "ngDfp is a simple library for Angular JS that allows you to add DoubleClick for Publishers tags to your Angular site.",
-  "main": "angular-dfp.min.js",
+  "main": "index.js",
   "repository": {
     "type": "git",
     "url": "git@github.com:ianmurrays/ngDfp.git"

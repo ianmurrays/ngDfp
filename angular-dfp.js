@@ -438,5 +438,3 @@ angular.module('ngDfp', [])
       }
     };
   }]);
- 
-module.exports = 'ngDfp';
