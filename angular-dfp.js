@@ -374,6 +374,7 @@ angular.module('ngDfp', [])
           element.html('');
 
           var intervalPromise = null;
+          var timeoutPromise = null;
 
           DoubleClick.getSlot(id).then(function (slot) {
             var size = slot.getSize();
@@ -415,9 +416,6 @@ angular.module('ngDfp', [])
                 return;
               }
 
-              // Cancel previous interval
-              $interval.cancel(intervalPromise);
-
               intervalPromise = $interval(function () {
                 DoubleClick.refreshAds(id);
               }, scope.interval);
@@ -429,9 +427,17 @@ angular.module('ngDfp', [])
                 return;
               }
 
-              $timeout(function () {
+              timeoutPromise = $timeout(function () {
                 DoubleClick.refreshAds(id);
               }, scope.timeout);
+            });
+
+            // Cancel $interval and $timeout service when DOM destroy
+            scope.$on('$destroy', function() {
+              $interval.cancel(intervalPromise);
+              $timeout.cancel(timeoutPromise);
+              intervalPromise = null;
+              timeoutPromise = null;
             });
           });
         });
