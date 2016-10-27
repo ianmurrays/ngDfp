@@ -142,7 +142,7 @@ angular.module('ngDfp', [])
       var callback = slots[event.slot.getSlotId().getDomId()].renderCallback;
       
       if (typeof callback === 'function') {
-        callback();
+        callback(event);
       }
     };
 
