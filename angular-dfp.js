@@ -41,6 +41,11 @@ angular.module('ngDfp', [])
      Collapse empty divs if true
      */
     var collapseEmptyDivs = false;
+     
+     /**
+     Center divs if true
+     */
+    var setCentering = false;  
 
     /**
      * If true, enables Single Request Architecture (SRA)
@@ -115,6 +120,13 @@ angular.module('ngDfp', [])
          */
         if (collapseEmptyDivs) {
           googletag.pubads().collapseEmptyDivs();
+        }
+	      
+	/**
+         If requested set to true the setCentering
+         */
+        if (setCentering) {
+          googletag.pubads().setCentering(true); 
         }
 
         if (enableSingleRequest) {
@@ -227,6 +239,13 @@ angular.module('ngDfp', [])
      */
     this.collapseEmptyDivs = function () {
       collapseEmptyDivs = true;
+    };
+	  
+    /**
+     Set to true the setCentering
+     */
+    this.setCentering = function (bool) {
+      setCentering = bool;
     };
 
     /**
