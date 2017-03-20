@@ -273,11 +273,12 @@ angular.module('ngDfp', [])
               });
             }, self._refreshInterval());
           }
+
+          deferred.resolve();
         } catch (err) {
-          console.error(err);
+          deferred.reject(err);
         }
 
-        deferred.resolve();
       });
       
       return {
