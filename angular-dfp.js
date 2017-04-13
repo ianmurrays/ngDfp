@@ -263,17 +263,22 @@ angular.module('ngDfp', [])
       var deferred = $q.defer();
 
       self._createTag(function () {
-        self._initialize();
+        try {
+          self._initialize();
 
-        if (self._refreshInterval() !== null) {
-          $interval(function () {
-            googletag.cmd.push(function() {
-              $window.googletag.pubads().refresh();
-            });
-          }, self._refreshInterval());
+          if (self._refreshInterval() !== null) {
+            $interval(function () {
+              googletag.cmd.push(function() {
+                $window.googletag.pubads().refresh();
+              });
+            }, self._refreshInterval());
+          }
+
+          deferred.resolve();
+        } catch (err) {
+          deferred.reject(err);
         }
 
-        deferred.resolve();
       });
       
       return {
