@@ -32,7 +32,7 @@ and configure your slots in your app's config:
 
 Now, to show an ad, simply use the `ng-dfp-ad`:
 
-    <div data-ng-dfp-ad="div-gpt-ad-1234567890123-0"></div>
+    <div ng-dfp-ad="div-gpt-ad-1234567890123-0"></div>
 
 Refreshing Ads
 --------------
