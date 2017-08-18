@@ -22,7 +22,7 @@ angular.module('ngDfp', [])
      */
     var sizeMapping = {};
 
-    /** 
+    /**
      If configured, all ads will be refreshed at the same interval
      */
     var refreshInterval = null;
@@ -41,11 +41,11 @@ angular.module('ngDfp', [])
      Collapse empty divs if true
      */
     var collapseEmptyDivs = false;
-     
+
      /**
      Center divs if true
      */
-    var setCentering = false;  
+    var setCentering = false;
 
     /**
      * If true, enables Single Request Architecture (SRA)
@@ -71,7 +71,7 @@ angular.module('ngDfp', [])
       gads.async = true;
       gads.type  = 'text/javascript';
       gads.src   = (useSSL ? 'https:' : 'http:') + ngDfpUrl;
-      
+
       // Insert before any JS include.
       node.parentNode.insertBefore(gads, node);
 
@@ -100,7 +100,7 @@ angular.module('ngDfp', [])
           /**
            If sent, set the slot specific targeting
            */
-	  var slotTargeting = slot.getSlotTargeting();
+    var slotTargeting = slot.getSlotTargeting();
           if(slotTargeting){
             angular.forEach(slotTargeting, function (value, key) {
               definedSlots[id].setTargeting(value.id, value.value);
@@ -108,7 +108,7 @@ angular.module('ngDfp', [])
           }
         });
 
-	      /**
+        /**
          Set the page targeting key->values
          */
         angular.forEach(pageTargeting, function (value, key) {
@@ -121,12 +121,12 @@ angular.module('ngDfp', [])
         if (collapseEmptyDivs) {
           googletag.pubads().collapseEmptyDivs();
         }
-	      
-	/**
+
+  /**
          If requested set to true the setCentering
          */
         if (setCentering) {
-          googletag.pubads().setCentering(true); 
+          googletag.pubads().setCentering(true);
         }
 
         if (enableSingleRequest) {
@@ -140,7 +140,7 @@ angular.module('ngDfp', [])
 
     this._slotRenderEnded = function (event) {
       var callback = slots[event.slot.getSlotId().getDomId()].renderCallback;
-      
+
       if (typeof callback === 'function') {
         callback(event);
       }
@@ -208,7 +208,7 @@ angular.module('ngDfp', [])
       if(!sizeMapping[id]){
         sizeMapping[id] = [];
       }
-      
+
       // Add a new size mapping ( [browser size], [slot size])
       this.addSize = function() {
         sizeMapping[id].push([arguments[0], arguments[1]]);
@@ -240,7 +240,7 @@ angular.module('ngDfp', [])
     this.collapseEmptyDivs = function () {
       collapseEmptyDivs = true;
     };
-	  
+
     /**
      Set to true the setCentering
      */
@@ -280,11 +280,11 @@ angular.module('ngDfp', [])
         }
 
       });
-      
+
       return {
         /**
-         More than just getting the ad size, this 
-         allows us to wait for the JS file to finish downloading and 
+         More than just getting the ad size, this
+         allows us to wait for the JS file to finish downloading and
          configuring ads
 
          @deprecated Use getSlot().getSize() instead.
@@ -341,6 +341,19 @@ angular.module('ngDfp', [])
           googletag.cmd.push(function() {
             $window.googletag.pubads().refresh(slots);
           });
+        },
+
+        /**
+         *
+         * Set Ad target with Ad ID and a config object
+         *
+         */
+        setSlotTargeting: function(id, config) {
+          for (var key in config) {
+            if( config.hasOwnProperty(key) ) {
+              definedSlots[id].setTargeting(key, config[key]);
+            }
+          }
         }
       };
     }];
@@ -380,7 +393,7 @@ angular.module('ngDfp', [])
     };
   })
 
-  .directive('ngDfpAd', ['$timeout', '$parse', '$interval', 'DoubleClick', function ($timeout, $parse, $interval, DoubleClick) {
+  .directive('ngDfpAd', ['$timeout', '$parse', '$interval', 'DoubleClick', '$location', function ($timeout, $parse, $interval, DoubleClick, $location) {
     return {
       restrict: 'A',
       template: '<div id="{{adId}}"></div>',
@@ -389,10 +402,15 @@ angular.module('ngDfp', [])
         adId: '@ngDfpAd',
         refresh: '@ngDfpAdRefresh',
         interval: '@ngDfpAdRefreshInterval',
-        timeout: '@ngDfpAdRefreshTimeout'
+        timeout: '@ngDfpAdRefreshTimeout',
+        target: '@ngDfpTarget'
       },
       replace: true,
       link: function (scope, element, attrs, ngDfpAdContainer) {
+
+        // Get Ad position
+        var pos = attrs.ngDfpPos;
+
         scope.$watch('adId', function (id) {
           // Get rid of the previous ad.
           element.html('');
@@ -425,6 +443,27 @@ angular.module('ngDfp', [])
                 }
               });
             }
+
+            scope.$watch('target', function(target) {
+              if(angular.isUndefined(target) || target.length < 1) {
+                return;
+              }
+
+              var targetingInfo = JSON.parse(target);
+
+              // Set the position of the ad
+              targetingInfo.pos = pos;
+
+              // Set the environment
+              targetingInfo.env = $location.host();
+
+              // Set ad target information and refresh the Ad
+              googletag.cmd.push(function() {
+                DoubleClick.setSlotTargeting(id, targetingInfo);
+                DoubleClick.refreshAds(id);
+              });
+
+            });
 
             // Forces Refresh
             scope.$watch('refresh', function (refresh) {
