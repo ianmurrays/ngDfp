@@ -41,6 +41,17 @@ angular.module('ngDfp', [])
      Collapse empty divs if true
      */
     var collapseEmptyDivs = false;
+     
+     /**
+     Center divs if true
+     */
+    var setCentering = false;  
+
+    /**
+     * If true, enables Single Request Architecture (SRA)
+     * @type {boolean}
+     */
+    var enableSingleRequest = true;
 
     /**
      This initializes the dfp script in the document. Loosely based on angular-re-captcha's
@@ -93,10 +104,25 @@ angular.module('ngDfp', [])
         googletag.pubads().collapseEmptyDivs();
       }
 
-      googletag.pubads().enableSingleRequest();
-      googletag.enableServices();
 
-      googletag.pubads().addEventListener('slotRenderEnded', self._slotRenderEnded);
+        /**
+         If requested set to true the collapseEmptyDivs
+         */
+        if (collapseEmptyDivs) {
+          googletag.pubads().collapseEmptyDivs();
+        }
+	      
+	/**
+         If requested set to true the setCentering
+         */
+        if (setCentering) {
+          googletag.pubads().setCentering(true); 
+        }
+
+        if (enableSingleRequest) {
+          googletag.pubads().enableSingleRequest();
+        }
+        googletag.enableServices();
 
     };
 
@@ -104,7 +130,7 @@ angular.module('ngDfp', [])
       var callback = slots[event.slot.getSlotId().getDomId()].renderCallback;
 
       if (typeof callback === 'function') {
-        callback();
+        callback(event);
       }
     };
 
@@ -213,6 +239,21 @@ angular.module('ngDfp', [])
     this.collapseEmptyDivs = function () {
       collapseEmptyDivs = true;
     };
+	  
+    /**
+     Set to true the setCentering
+     */
+    this.setCentering = function (bool) {
+      setCentering = bool;
+    };
+
+    /**
+     * Set Single Request Architecture
+     * @param isEnable
+     */
+    this.setSingleRequest = function (isEnable) {
+      enableSingleRequest = isEnable;
+    };
 
     // Public factory API.
     var self  = this;
@@ -221,16 +262,23 @@ angular.module('ngDfp', [])
       var deferred = $q.defer();
 
       self._createTag(function () {
-        //self._initialize();
-        if (self._refreshInterval() !== null) {
-          $interval(function () {
-            googletag.cmd.push(function() {
-              $window.googletag.pubads().refresh();
-            });
-          }, self._refreshInterval());
+
+        try {
+          self._initialize();
+
+          if (self._refreshInterval() !== null) {
+            $interval(function () {
+              googletag.cmd.push(function() {
+                $window.googletag.pubads().refresh();
+              });
+            }, self._refreshInterval());
+          }
+
+          deferred.resolve();
+        } catch (err) {
+          deferred.reject(err);
         }
 
-        deferred.resolve();
       });
 
       return {
@@ -365,6 +413,7 @@ angular.module('ngDfp', [])
           element.html('');
 
           var intervalPromise = null;
+          var timeoutPromise = null;
 
           DoubleClick.getSlot(id).then(function (slot) {
             DoubleClick.fireAd(id);
@@ -409,9 +458,6 @@ angular.module('ngDfp', [])
                 return;
               }
 
-              // Cancel previous interval
-              $interval.cancel(intervalPromise);
-
               intervalPromise = $interval(function () {
                 DoubleClick.refreshAds(id);
               }, scope.interval);
@@ -423,9 +469,17 @@ angular.module('ngDfp', [])
                 return;
               }
 
-              $timeout(function () {
+              timeoutPromise = $timeout(function () {
                 DoubleClick.refreshAds(id);
               }, scope.timeout);
+            });
+
+            // Cancel $interval and $timeout service when DOM destroy
+            scope.$on('$destroy', function() {
+              $interval.cancel(intervalPromise);
+              $timeout.cancel(timeoutPromise);
+              intervalPromise = null;
+              timeoutPromise = null;
             });
           });
         });

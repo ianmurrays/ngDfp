@@ -15,6 +15,10 @@ Just install via bower:
 
     bower install ngDfp --save
 
+or npm:
+
+    npm install ngDfp --save
+
 Then, include it as a dependency:
 
     angular.module('your.module', ['ngDfp'])
